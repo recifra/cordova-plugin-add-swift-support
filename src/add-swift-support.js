@@ -21,6 +21,7 @@ const xcode = require('xcode');
 const childProcess = require('child_process');
 const semver = require('semver');
 const glob = require('glob');
+const cordova_ios = require('cordova-ios');
 
 module.exports = context => {
   const projectRoot = context.opts.projectRoot;
@@ -33,6 +34,7 @@ module.exports = context => {
     getPlatformVersionsFromFileSystem(context, projectRoot).then(platformVersions => {
       const IOS_MIN_DEPLOYMENT_TARGET = '7.0';
       const platformPath = path.join(projectRoot, 'platforms', 'ios');
+      const iosProject = new cordova_ios('ios', platformPath);
       const config = getConfigParser(context, path.join(projectRoot, 'config.xml'));
 
       let bridgingHeaderPath;
@@ -59,9 +61,8 @@ module.exports = context => {
         return;
       }
 
-      projectName = config.name();
-      projectPath = path.join(platformPath, projectName);
-      pbxprojPath = path.join(platformPath, projectName + '.xcodeproj', 'project.pbxproj');
+      projectPath = iosProject.locations.xcodeProjDir;
+      pbxprojPath = iosProject.locations.pbxproj;
       xcodeProject = xcode.project(pbxprojPath);
       pluginsPath = path.join(projectPath, 'Plugins');
 
